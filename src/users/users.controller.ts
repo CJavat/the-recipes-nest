@@ -1,14 +1,19 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Req,
+  Post,
 } from '@nestjs/common';
+
 import { UsersService } from './users.service';
+
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('users')
 export class UsersController {
@@ -25,24 +30,34 @@ export class UsersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  @UseGuards(AuthGuard())
+  update(
+    @Req() request: Express.Request,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    const userId = request.user['id'];
+
+    return this.usersService.update(userId, updateUserDto);
   }
 
   @Delete('cancelAccount/:id')
-  cancelAccount(@Param('id') id: string) {
-    return this.usersService.cancelAccount(id);
+  @UseGuards(AuthGuard())
+  cancelAccount(@Req() request: Express.Request) {
+    const userId = request.user['id'];
+
+    return this.usersService.cancelAccount(userId);
   }
 
-  @Get('reactivateAccount/:id')
-  reactivateAccount(@Param('id') id: string) {
-    //TODO: Terminar
-    return this.usersService.reactivateAccount();
+  @Post('reactivateAccount')
+  reactivateAccount(@Body() body: { email: string }) {
+    return this.usersService.reactivateAccount(body);
   }
 
   @Delete('permanentlyDelete/:id')
-  permanentlyDelete(@Param('id') id: string) {
-    //TODO: Terminar
-    return this.usersService.permanentlyDelete();
+  @UseGuards(AuthGuard())
+  permanentlyDelete(@Req() request: Express.Request) {
+    const userId = request.user['id'];
+
+    return this.usersService.permanentlyDelete(userId);
   }
 }

@@ -3,32 +3,38 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateUserDto, LoginUserDto } from './dto';
+import { JwtService } from '@nestjs/jwt';
 import { PrismaClient } from '@prisma/client';
 import * as bcryptjs from 'bcryptjs';
-import * as jwt from 'jsonwebtoken';
 
+import { CreateUserDto, LoginUserDto } from './dto';
+import { JwtPayload } from './interfaces';
 @Injectable()
-export class AuthService extends PrismaClient {
+export class AuthService {
+  private prismaClient = new PrismaClient();
+
+  constructor(private readonly jwtService: JwtService) {}
+
   async create(createUserDto: CreateUserDto) {
-    const { password, ...user } = createUserDto;
+    const { password, email, ...user } = createUserDto;
 
     try {
+      const newEmail = email.toLowerCase();
       const newPassword = bcryptjs.hashSync(password, 10);
 
-      const newUser = await this.user.create({
+      const newUser = await this.prismaClient.user.create({
         data: {
+          email: newEmail,
           password: newPassword,
           ...user,
         },
       });
 
       return {
-        newUser,
-        ok: true,
+        ...newUser,
+        token: this.checkJwt({ userId: newUser.id }),
       };
     } catch (error) {
-      console.log(error);
       if (error.code === 'P2002')
         throw new BadRequestException('Email already exists');
     }
@@ -38,34 +44,28 @@ export class AuthService extends PrismaClient {
     const { email, password } = loginUserDto;
 
     try {
-      const user = await this.user.findUnique({ where: { email } });
+      const user = await this.prismaClient.user.findUnique({
+        where: { email },
+      });
       if (!user || (user && !user.isActive))
         throw new NotFoundException('User not found');
       if (!bcryptjs.compareSync(password, user.password))
         throw new BadRequestException('Invalid password');
 
-      const payload = {
-        userId: user.id,
-        email: user.email,
-      };
-
       return {
-        user,
-        ok: true,
-        token: jwt.sign(payload, process.env.SECRET_KEY, {
-          expiresIn: '7d',
-        }),
+        ...user,
+        token: this.checkJwt({ userId: user.id }),
       };
     } catch (error) {
-      console.log(error);
       return {
         error: error.response ?? error,
-        ok: false,
       };
     }
   }
 
-  checkJwt() {
-    //TODO: Crear el check-jwt y usarlo en el Guard
+  checkJwt(payload: JwtPayload) {
+    const token = this.jwtService.sign(payload);
+
+    return token;
   }
 }
