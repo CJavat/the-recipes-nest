@@ -15,7 +15,15 @@ export class UsersService {
 
   async findAll() {
     try {
-      const users = await this.prismaClient.user.findMany();
+      const users = await this.prismaClient.user.findMany({
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          isActive: true,
+        },
+      });
       if (!users || users.length === 0)
         throw new NotFoundException('Users not found');
 
@@ -31,6 +39,13 @@ export class UsersService {
     try {
       const user = await this.prismaClient.user.findUnique({
         where: { id: id },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          isActive: true,
+        },
       });
       if (!user || !user.isActive) {
         throw new NotFoundException('User not found');
@@ -49,7 +64,7 @@ export class UsersService {
       const { user } = await this.findOne(id);
       if (user.id !== id)
         throw new UnauthorizedException(
-          'No tienes permitido actualizar esta cuenta',
+          'You are not allowed to update this account',
         );
 
       if (updateUserDto.password) {
@@ -61,6 +76,14 @@ export class UsersService {
         data: {
           ...updateUserDto,
           updatedAt: new Date(),
+        },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          isActive: true,
+          updatedAt: true,
         },
       });
 
@@ -78,7 +101,7 @@ export class UsersService {
 
       if (user.id !== id)
         throw new UnauthorizedException(
-          'No tienes permitido borrar esta cuenta',
+          'You are not allowed to delete this account',
         );
 
       // await this.user.delete({ where: { id: id } });
@@ -107,7 +130,7 @@ export class UsersService {
 
       if (user.email !== email)
         throw new UnauthorizedException(
-          'No tienes permitido reactivar esta cuenta',
+          'You are not allowed to reactivate this account',
         );
 
       if (isMoreThan30DaysOld(user.updatedAt))
@@ -128,12 +151,11 @@ export class UsersService {
 
   async permanentlyDelete(id: string) {
     //TODO: Si la cuenta tiene más de 3 meses inactiva borrarla. Condición: (isActive = false && updatedAt > 3Meses)
-
     try {
       const { user } = await this.findOne(id);
       if (user.id !== id)
         throw new UnauthorizedException(
-          'No tienes permitido borrar esta cuenta',
+          'You are not allowed to delete this account',
         );
 
       await this.prismaClient.user.delete({ where: { id } });

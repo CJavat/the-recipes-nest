@@ -28,6 +28,14 @@ export class AuthService {
           password: newPassword,
           ...user,
         },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          isActive: true,
+          createdAt: true,
+        },
       });
 
       return {
@@ -52,8 +60,10 @@ export class AuthService {
       if (!bcryptjs.compareSync(password, user.password))
         throw new BadRequestException('Invalid password');
 
+      const { password: encryptedPassword, ...userWithNoPassword } = user;
+
       return {
-        ...user,
+        ...userWithNoPassword,
         token: this.checkJwt({ userId: user.id }),
       };
     } catch (error) {

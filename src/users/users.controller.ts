@@ -40,7 +40,7 @@ export class UsersController {
     return this.usersService.update(userId, updateUserDto);
   }
 
-  @Delete('cancelAccount/:id')
+  @Delete('cancelAccount')
   @UseGuards(AuthGuard())
   cancelAccount(@Req() request: Express.Request) {
     const userId = request.user['id'];
@@ -53,7 +53,7 @@ export class UsersController {
     return this.usersService.reactivateAccount(body);
   }
 
-  @Delete('permanentlyDelete/:id')
+  @Delete('permanentlyDelete')
   @UseGuards(AuthGuard())
   permanentlyDelete(@Req() request: Express.Request) {
     const userId = request.user['id'];
