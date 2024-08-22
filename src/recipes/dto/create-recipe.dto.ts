@@ -19,11 +19,4 @@ export class CreateRecipeDto {
   @IsString()
   @IsOptional()
   image?: string;
-
-  @IsString()
-  createdBy: string;
-
-  // createdAt?: Date;
-
-  // updatedAt?: Date;
 }

@@ -18,7 +18,7 @@ model Recipe {
   createdAt DateTime  @default(now())
   updatedAt DateTime?
 
-  // Relationship
+  //* Relationship
   User   User?   @relation(fields: [userId], references: [id])
   userId String?
 }
@@ -34,6 +34,18 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime?
 
-  // Relationship
+  //* Relationship
   recipes Recipe[]
 }
+
+//TODO: Hacer la categoría
+// model Category {
+//   id String @id @default(uuid())
+//   name String
+
+//* Relationship
+//   recipes Recipe[]
+// }
+
+//TODO: Hacer el modelo de las imágenes
+// model Image {}

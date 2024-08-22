@@ -11,27 +11,48 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
     this.logger.log('Database Connected Successfully');
   }
 
-  create(createRecipeDto: CreateRecipeDto) {
-    //TODO: Validar y mejorar esta creación
-    const { title, description, createdBy, ingredients, steps, image } =
-      createRecipeDto;
+  async create(userId: string, createRecipeDto: CreateRecipeDto) {
+    try {
+      //TODO: Falta implementar la subida de imagenes.
 
-    return this.recipe.create({ data: createRecipeDto });
+      const recipe = await this.recipe.create({
+        data: {
+          ...createRecipeDto,
+          userId,
+        },
+      });
+
+      return recipe;
+    } catch (error) {
+      throw error;
+    }
   }
 
   findAll() {
-    return this.recipe.findMany();
+    try {
+      return this.recipe.findMany();
+    } catch (error) {
+      throw error;
+    }
   }
 
-  findOne(id: number) {
+  findAllByUser(id: string) {
+    return `Method findAllByUser not implemented: id: ${id}`;
+  }
+
+  findByCatagory(id: string) {
+    return `Method findByCatagory not implemented: id: ${id}`;
+  }
+
+  findOne(id: string) {
     return `This action returns a #${id} recipe`;
   }
 
-  update(id: number, updateRecipeDto: UpdateRecipeDto) {
+  update(userId: string, id: string, updateRecipeDto: UpdateRecipeDto) {
     return `This action updates a #${id} recipe`;
   }
 
-  remove(id: number) {
+  remove(userId: string, id: string) {
     return `This action removes a #${id} recipe`;
   }
 }
