@@ -4,9 +4,10 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 
 import { join } from 'path';
 
-import { RecipesModule } from './recipes/recipes.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { RecipesModule } from './recipes/recipes.module';
+import { CategoriesModule } from './categories/categories.module';
 import { CommonModule } from './common/common.module';
 import { SeedModule } from './seed/seed.module';
 
@@ -21,6 +22,7 @@ import { SeedModule } from './seed/seed.module';
     UsersModule,
     CommonModule,
     SeedModule,
+    CategoriesModule,
   ],
   controllers: [],
   providers: [],

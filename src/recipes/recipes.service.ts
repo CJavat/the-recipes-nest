@@ -81,9 +81,35 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
     }
   }
 
-  findByCatagory(id: string) {
-    //TODO: Terminar
-    return `Method findByCatagory not implemented: id: ${id}`;
+  async findByCatagory(id: string) {
+    try {
+      const recipes = await this.recipe.findMany({
+        where: { categoryId: id },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          ingredients: true,
+          steps: true,
+          image: true,
+          User: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+        },
+      });
+
+      if (recipes.length === 0)
+        throw new NotFoundException('Recipes not found');
+
+      return recipes;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async findOne(id: string) {

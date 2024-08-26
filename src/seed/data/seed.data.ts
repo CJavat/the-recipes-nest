@@ -1,5 +1,3 @@
-import * as bcrypt from 'bcryptjs';
-
 interface SeedUser {
   firstName: string;
   lastName: string;
@@ -59,7 +57,6 @@ export const initialData: SeedData = {
     },
   ],
   recipes: [
-    //TODO: Agregarle las categorías a las recetas
     {
       title: 'Pasta BLT',
       description:
@@ -79,7 +76,6 @@ export const initialData: SeedData = {
         'Sirve la ensalada BLT y acompaña con el aderezo y una bebida refrescante.',
       ],
       image: 'pastablt.jpg',
-      // categories:
     },
     {
       title: 'Pasta con chipotle, aguacate y mango',
@@ -100,7 +96,6 @@ export const initialData: SeedData = {
         'Mezcla los granos de elote, los jitomates cherry, los pepinos persas, el aguacate, el mango, la menta y la pasta Rotini De Luigi® en un bowl. Sirve la pasta con chipotle, aguacate y mango en una ensaladera y acompaña con el aderezo.',
       ],
       image: 'pasta-con-chipotle-aguacate-y-mango.jpg',
-      // categories:
     },
     {
       title: 'Pasta de Crema de Champiñones',
@@ -122,7 +117,6 @@ export const initialData: SeedData = {
         'Servir sobre la pasta.',
       ],
       image: 'pasta-de-crema-de-champinones.jpg',
-      // categories:
     },
     {
       title: 'Hot Cakes Tiramisú',
@@ -146,7 +140,6 @@ export const initialData: SeedData = {
         'Sirve un hot cake, agrega un poco de crema, coloca otro hot cake encima y añade otra capa de crema. Repite el mismo proceso para obtener otra capa y decora con miel de maple, crema y cocoa en polvo.',
       ],
       image: 'hot-cakes-tiramisu.jpg',
-      // categories:
     },
     {
       title: 'Tacos de Hot Cakes con Fruta',
@@ -167,7 +160,6 @@ export const initialData: SeedData = {
         'Unta una cucharada de Nutella® por cada taco de hot cake. Rellena con las frutas. Sirve y disfruta.',
       ],
       image: 'tacos-de-hot-cakes-con-fruta.jpg',
-      // categories:
     },
     {
       title: 'Pavo BBQ',
@@ -191,7 +183,6 @@ export const initialData: SeedData = {
         'Precalienta el horno a 180°C.',
       ],
       image: 'pavo-bbq.jpg',
-      // categories:
     },
     {
       title: 'Ponche de manzana con caramelo',
@@ -212,7 +203,6 @@ export const initialData: SeedData = {
         'Vierte un poco de jarabe de caramelo en las paredes de la taza. Sirve el ponche caliente con un poco de fruta y decora con una raja de canela y una rebanada de manzana.',
       ],
       image: 'ponche-de-manzana-con-caramelo.jpg',
-      // categories:
     },
     {
       title: 'Mangonada',
@@ -234,7 +224,6 @@ export const initialData: SeedData = {
         'Vierte la mangonada en los vasos y coloca los cubitos de mango, decora con el chamoy, el chile y los dulces picositos. Sirve.',
       ],
       image: 'mangonada.jpg',
-      // categories:
     },
     {
       title: 'Smoothie de Granola con Frutos Rojos',
@@ -253,7 +242,6 @@ export const initialData: SeedData = {
         'Agrega un poco de hielo y sirve de inmediato.',
       ],
       image: 'smoothie-de-granola-con-frutos-rojos.jpg',
-      // categories:
     },
     {
       title: 'Limonada de Frambuesa',
@@ -274,8 +262,26 @@ export const initialData: SeedData = {
         'Agrega el tequila y hielos al gusto.',
       ],
       image: 'limonada-de-frambuesa.jpg',
-      // categories:
     },
   ],
-  categories: [],
+  categories: [
+    { name: 'Postres y Dulces' },
+    { name: 'Arroz' },
+    { name: 'Pasta' },
+    { name: 'Carnes y Aves' },
+    { name: 'Pescado y Marisco' },
+    { name: 'Verduras y Hortalizas' },
+    { name: 'Sopas, Caldos y Cremas' },
+    { name: 'Huevos y Tortillas' },
+    { name: 'Salsas y Guarniciones' },
+    { name: 'Ensaladas' },
+    { name: 'Legumbres y Guisos' },
+    { name: 'Tapas y Aperitivos' },
+    { name: 'Pan, Masas y Rebozados' },
+    { name: 'Bebidas y Cócteles' },
+    { name: 'Recetas por Técnica' },
+    { name: 'Receptas por Ocasión' },
+    { name: 'Recetas por País' },
+    { name: 'Otros' },
+  ],
 };

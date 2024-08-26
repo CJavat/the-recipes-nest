@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 
 import { RecipesService } from '../recipes/recipes.service';
 import { AuthService } from 'src/auth/auth.service';
-import { UsersService } from '../users/users.service';
 
 import { initialData } from './data/seed.data';
 import { PrismaClient } from '@prisma/client';
+import { CategoriesService } from 'src/categories/categories.service';
 
 @Injectable()
 export class SeedService {
@@ -14,22 +14,22 @@ export class SeedService {
   constructor(
     private readonly recipesService: RecipesService,
     private readonly authService: AuthService,
-    private readonly usersService: UsersService,
+    private readonly categoriesService: CategoriesService,
   ) {}
 
   async runSeed() {
     try {
-      let users: string[] = [];
       //* Delete tables.
       await this.deleteTables();
 
       //* Insert Users
-      users = await this.insertUsers();
+      const users: string[] = await this.insertUsers();
 
       //*Inset Categories
+      const categories: string[] = await this.insertCategories();
 
       //* Inset Recipes
-      await this.insertRecipes(users);
+      await this.insertRecipes(users, categories);
 
       return 'Seed Executed Successfully';
     } catch (error) {
@@ -42,7 +42,7 @@ export class SeedService {
       await Promise.all([
         await this.prismaClient.user.deleteMany({}),
         await this.prismaClient.recipe.deleteMany({}),
-        // await this.prismaClient.category.deleteMany({});
+        await this.prismaClient.category.deleteMany({}),
       ]);
     } catch (error) {
       throw error;
@@ -59,15 +59,26 @@ export class SeedService {
     return users.map((usr) => usr.id);
   }
 
-  private async insertRecipes(users: string[]) {
+  private async insertRecipes(users: string[], categories: string[]) {
     const seedRecipes = initialData.recipes;
 
     seedRecipes.forEach(async (recipe) => {
       const userRandom = Math.floor(Math.random() * 5);
+      const categoryRandom = Math.floor(Math.random() * categories.length);
+
+      recipe['categoryId'] = categories[categoryRandom];
 
       await this.recipesService.create(users[userRandom], recipe);
     });
   }
 
-  //TODO: Agregar datos para la categoría
+  private async insertCategories() {
+    const seedCategories = initialData.categories;
+
+    const categories = await Promise.all(
+      seedCategories.map((category) => this.categoriesService.create(category)),
+    );
+
+    return categories.map((c) => c.id);
+  }
 }
