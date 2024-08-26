@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   Logger,
   NotFoundException,
@@ -8,18 +9,31 @@ import {
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { PrismaClient } from '@prisma/client';
+import { FilesService } from 'src/files/files.service';
 
 @Injectable()
 export class RecipesService extends PrismaClient implements OnModuleInit {
   private readonly logger = new Logger('RecipesService');
+
+  constructor(private readonly filesService: FilesService) {
+    super();
+  }
+
   onModuleInit() {
     this.$connect();
     this.logger.log('Database Connected Successfully');
   }
 
-  async create(userId: string, createRecipeDto: CreateRecipeDto) {
+  async create(
+    userId: string,
+    createRecipeDto: CreateRecipeDto,
+    file?: Express.Multer.File,
+  ) {
     try {
-      //TODO: Falta implementar la subida de imagenes.
+      if (file) {
+        const { secureUrl } = this.filesService.uploadFile(file);
+        createRecipeDto.image = secureUrl.split('/').at(-1);
+      }
 
       const recipe = await this.recipe.create({
         data: {
@@ -178,6 +192,47 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
       return {
         message: `Recipe with id ${id} has been deleted permanently`,
       };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async changeImage(id: string, userId: string, file: Express.Multer.File) {
+    try {
+      const recipe = await this.findOne(id);
+      if (recipe.User.id !== userId)
+        throw new UnauthorizedException(
+          'You are not allowed to update this account',
+        );
+
+      if (!file) throw new BadRequestException(`Image ${file} is not valid`);
+
+      const { secureUrl } = this.filesService.uploadFile(file);
+      const image = secureUrl.split('/').at(-1);
+
+      const updatedUser = await this.recipe.update({
+        where: { id: id },
+        data: {
+          image: image,
+          updatedAt: new Date(),
+        },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          ingredients: true,
+          steps: true,
+          image: true,
+          userId: true,
+          Category: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      });
+
+      return updatedUser;
     } catch (error) {
       throw error;
     }

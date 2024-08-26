@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -8,10 +9,13 @@ import * as bcryptjs from 'bcryptjs';
 
 import { UpdateUserDto } from './dto/update-user.dto';
 import { isMoreThan30DaysOld } from './helpers/isMoreThan60DaysOld.helper';
+import { FilesService } from '../files/files.service';
 
 @Injectable()
 export class UsersService {
   private prismaClient = new PrismaClient();
+
+  constructor(private readonly filesService: FilesService) {}
 
   async findAll() {
     try {
@@ -163,6 +167,41 @@ export class UsersService {
       return {
         message: `User with id ${id} has been deleted permanently`,
       };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async changeImage(userId: string, file: Express.Multer.File) {
+    try {
+      const { user } = await this.findOne(userId);
+      if (user.id !== userId)
+        throw new UnauthorizedException(
+          'You are not allowed to update this account',
+        );
+
+      if (!file) throw new BadRequestException(`Image ${file} is not valid`);
+
+      const { secureUrl } = this.filesService.uploadFile(file);
+      const avatar = secureUrl.split('/').at(-1);
+
+      const updatedUser = await this.prismaClient.user.update({
+        where: { id: userId },
+        data: {
+          avatar: avatar,
+        },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          isActive: true,
+          updatedAt: true,
+          avatar: true,
+        },
+      });
+
+      return updatedUser;
     } catch (error) {
       throw error;
     }

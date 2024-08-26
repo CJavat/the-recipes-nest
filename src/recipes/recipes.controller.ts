@@ -8,11 +8,17 @@ import {
   Delete,
   UseGuards,
   Req,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { RecipesService } from './recipes.service';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { fileFilter } from 'src/files/helpers/fileFilter.helper';
+import { diskStorage } from 'multer';
+import { fileNamer } from 'src/files/helpers/fileNamer.helper';
 
 @Controller('recipes')
 export class RecipesController {
@@ -20,13 +26,23 @@ export class RecipesController {
 
   @Post()
   @UseGuards(AuthGuard())
+  @UseInterceptors(
+    FileInterceptor('file', {
+      fileFilter: fileFilter,
+      storage: diskStorage({
+        destination: './public',
+        filename: fileNamer,
+      }),
+    }),
+  )
   create(
     @Req() request: Express.Request,
     @Body() createRecipeDto: CreateRecipeDto,
+    @UploadedFile() file: Express.Multer.File,
   ) {
     const userId = request.user['id'];
 
-    return this.recipesService.create(userId, createRecipeDto);
+    return this.recipesService.create(userId, createRecipeDto, file);
   }
 
   @Get()
@@ -45,6 +61,27 @@ export class RecipesController {
   @Get('by-category/:idCategory')
   findByCatagory(@Param('idCategory') idCategory: string) {
     return this.recipesService.findByCatagory(idCategory);
+  }
+
+  @Patch('change-image/:id')
+  @UseGuards(AuthGuard())
+  @UseInterceptors(
+    FileInterceptor('file', {
+      fileFilter: fileFilter,
+      storage: diskStorage({
+        destination: './public',
+        filename: fileNamer,
+      }),
+    }),
+  )
+  changeImage(
+    @Req() request: Express.Request,
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const userId = request.user['id'];
+
+    return this.recipesService.changeImage(id, userId, file);
   }
 
   @Get(':id')

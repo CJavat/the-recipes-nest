@@ -13,7 +13,7 @@ model Recipe {
   description String?
   ingredients String[]
   steps       String[]
-  image       String?  @default("no-recipe-image")
+  image       String?  @default("no-recipe-image.jpg")
 
   createdAt DateTime  @default(now())
   updatedAt DateTime?
@@ -31,7 +31,7 @@ model User {
   lastName  String
   email     String  @unique
   password  String
-  avatar    String? @default("no-user-image")
+  avatar    String? @default("no-user-image.jpg")
   isActive  Boolean @default(true)
 
   createdAt DateTime  @default(now())

@@ -8,12 +8,18 @@ import {
   UseGuards,
   Req,
   Post,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 
 import { UsersService } from './users.service';
 
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { fileNamer } from 'src/files/helpers/fileNamer.helper';
+import { fileFilter } from 'src/files/helpers/fileFilter.helper';
 
 @Controller('users')
 export class UsersController {
@@ -22,6 +28,47 @@ export class UsersController {
   @Get()
   findAll() {
     return this.usersService.findAll();
+  }
+
+  @Delete('cancel-account')
+  @UseGuards(AuthGuard())
+  cancelAccount(@Req() request: Express.Request) {
+    const userId = request.user['id'];
+
+    return this.usersService.cancelAccount(userId);
+  }
+
+  @Post('reactivate-account')
+  reactivateAccount(@Body() body: { email: string }) {
+    return this.usersService.reactivateAccount(body);
+  }
+
+  @Delete('permanently-delete')
+  @UseGuards(AuthGuard())
+  permanentlyDelete(@Req() request: Express.Request) {
+    const userId = request.user['id'];
+
+    return this.usersService.permanentlyDelete(userId);
+  }
+
+  @Patch('change-image')
+  @UseGuards(AuthGuard())
+  @UseInterceptors(
+    FileInterceptor('file', {
+      fileFilter: fileFilter,
+      storage: diskStorage({
+        destination: './public',
+        filename: fileNamer,
+      }),
+    }),
+  )
+  changeImage(
+    @Req() request: Express.Request,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const userId = request.user['id'];
+
+    return this.usersService.changeImage(userId, file);
   }
 
   @Get(':id')
@@ -38,26 +85,5 @@ export class UsersController {
     const userId = request.user['id'];
 
     return this.usersService.update(userId, updateUserDto);
-  }
-
-  @Delete('cancelAccount')
-  @UseGuards(AuthGuard())
-  cancelAccount(@Req() request: Express.Request) {
-    const userId = request.user['id'];
-
-    return this.usersService.cancelAccount(userId);
-  }
-
-  @Post('reactivateAccount')
-  reactivateAccount(@Body() body: { email: string }) {
-    return this.usersService.reactivateAccount(body);
-  }
-
-  @Delete('permanentlyDelete')
-  @UseGuards(AuthGuard())
-  permanentlyDelete(@Req() request: Express.Request) {
-    const userId = request.user['id'];
-
-    return this.usersService.permanentlyDelete(userId);
   }
 }
