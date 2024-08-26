@@ -23,6 +23,8 @@ model Recipe {
   userId     String?
   Category   Category? @relation(fields: [categoryId], references: [id])
   categoryId String?
+
+  favorite Favorite[]
 }
 
 model User {
@@ -38,7 +40,8 @@ model User {
   updatedAt DateTime?
 
   //* Relationship
-  recipes Recipe[]
+  recipes  Recipe[]
+  favorite Favorite[]
 }
 
 model Category {
@@ -47,4 +50,18 @@ model Category {
 
   //* Relationship
   recipes Recipe[]
+}
+
+model Favorite {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  //* Relationship
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  recipeId String
+  recipe   Recipe @relation(fields: [recipeId], references: [id])
+
+  @@unique([userId, recipeId]) // Asegura que un usuario no pueda marcar la misma receta más de una vez
 }
