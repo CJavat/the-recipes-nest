@@ -10,6 +10,7 @@ import {
   Req,
   UploadedFile,
   UseInterceptors,
+  Query,
 } from '@nestjs/common';
 import { RecipesService } from './recipes.service';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
@@ -19,6 +20,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { fileFilter } from 'src/files/helpers/fileFilter.helper';
 import { diskStorage } from 'multer';
 import { fileNamer } from 'src/files/helpers/fileNamer.helper';
+import { PaginationDto } from 'src/common/dtos/pagination.dto';
 
 @Controller('recipes')
 export class RecipesController {
@@ -46,21 +48,27 @@ export class RecipesController {
   }
 
   @Get()
-  findAll() {
-    return this.recipesService.findAll();
+  findAll(@Query() paginationDto: PaginationDto) {
+    return this.recipesService.findAll(paginationDto);
   }
 
   @Get('by-user')
   @UseGuards(AuthGuard())
-  findAllByUser(@Req() request: Express.Request) {
+  findAllByUser(
+    @Req() request: Express.Request,
+    @Query() paginationDto: PaginationDto,
+  ) {
     const userId = request.user['id'];
 
-    return this.recipesService.findAllByUser(userId);
+    return this.recipesService.findAllByUser(userId, paginationDto);
   }
 
   @Get('by-category/:idCategory')
-  findByCatagory(@Param('idCategory') idCategory: string) {
-    return this.recipesService.findByCatagory(idCategory);
+  findByCatagory(
+    @Param('idCategory') idCategory: string,
+    @Query() paginationDto: PaginationDto,
+  ) {
+    return this.recipesService.findByCatagory(idCategory, paginationDto);
   }
 
   @Patch('change-image/:id')

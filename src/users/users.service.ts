@@ -10,6 +10,7 @@ import * as bcryptjs from 'bcryptjs';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { isMoreThan30DaysOld } from './helpers/isMoreThan60DaysOld.helper';
 import { FilesService } from '../files/files.service';
+import { PaginationDto } from 'src/common/dtos/pagination.dto';
 
 @Injectable()
 export class UsersService {
@@ -17,7 +18,9 @@ export class UsersService {
 
   constructor(private readonly filesService: FilesService) {}
 
-  async findAll() {
+  async findAll(paginationDto: PaginationDto) {
+    const { limit = 10, offset = 0 } = paginationDto;
+
     try {
       const users = await this.prismaClient.user.findMany({
         select: {
@@ -27,6 +30,8 @@ export class UsersService {
           email: true,
           isActive: true,
         },
+        skip: offset,
+        take: limit,
       });
       if (!users || users.length === 0)
         throw new NotFoundException('Users not found');

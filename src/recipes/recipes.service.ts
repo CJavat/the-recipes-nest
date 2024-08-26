@@ -10,6 +10,7 @@ import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { PrismaClient } from '@prisma/client';
 import { FilesService } from 'src/files/files.service';
+import { PaginationDto } from 'src/common/dtos/pagination.dto';
 
 @Injectable()
 export class RecipesService extends PrismaClient implements OnModuleInit {
@@ -48,7 +49,9 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
     }
   }
 
-  async findAll() {
+  async findAll(paginationDto: PaginationDto) {
+    const { limit = 10, offset = 0 } = paginationDto;
+
     try {
       const recipes = await this.recipe.findMany({
         // include: { User: true },
@@ -68,6 +71,8 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
             },
           },
         },
+        skip: offset,
+        take: limit,
       });
 
       if (recipes.length === 0)
@@ -79,11 +84,15 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
     }
   }
 
-  async findAllByUser(userId: string) {
+  async findAllByUser(userId: string, paginationDto: PaginationDto) {
+    const { limit = 10, offset = 0 } = paginationDto;
+
     try {
       const recipes = await this.recipe.findMany({
         where: { userId },
         include: { User: true },
+        skip: offset,
+        take: limit,
       });
 
       if (recipes.length === 0)
@@ -95,7 +104,9 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
     }
   }
 
-  async findByCatagory(id: string) {
+  async findByCatagory(id: string, paginationDto: PaginationDto) {
+    const { limit = 10, offset = 0 } = paginationDto;
+
     try {
       const recipes = await this.recipe.findMany({
         where: { categoryId: id },
@@ -115,6 +126,8 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
             },
           },
         },
+        skip: offset,
+        take: limit,
       });
 
       if (recipes.length === 0)
