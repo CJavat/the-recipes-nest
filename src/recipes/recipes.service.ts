@@ -11,6 +11,7 @@ import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { PrismaClient } from '@prisma/client';
 import { FilesService } from 'src/files/files.service';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { SearchRecipeDto } from './dto/search-recipe.dto';
 
 @Injectable()
 export class RecipesService extends PrismaClient implements OnModuleInit {
@@ -246,6 +247,37 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
       });
 
       return updatedUser;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async searchRecipe(searchRecipeDto: SearchRecipeDto) {
+    const { title, description, limit, offset } = searchRecipeDto;
+
+    try {
+      const recipes = await this.recipe.findMany({
+        where: {
+          AND: [
+            {
+              title: {
+                contains: title,
+                mode: 'insensitive', // Búsqueda insensible a mayúsculas y minúsculas
+              },
+            },
+            {
+              description: {
+                contains: description,
+                mode: 'insensitive',
+              },
+            },
+          ],
+        },
+        skip: offset,
+        take: limit,
+      });
+
+      return recipes;
     } catch (error) {
       throw error;
     }

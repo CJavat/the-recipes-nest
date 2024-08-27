@@ -21,6 +21,7 @@ import { fileFilter } from 'src/files/helpers/fileFilter.helper';
 import { diskStorage } from 'multer';
 import { fileNamer } from 'src/files/helpers/fileNamer.helper';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { SearchRecipeDto } from './dto/search-recipe.dto';
 
 @Controller('recipes')
 export class RecipesController {
@@ -90,6 +91,11 @@ export class RecipesController {
     const userId = request.user['id'];
 
     return this.recipesService.changeImage(id, userId, file);
+  }
+
+  @Get('search')
+  searchRecipe(@Query() searchRecipeDto: SearchRecipeDto) {
+    return this.recipesService.searchRecipe(searchRecipeDto);
   }
 
   @Get(':id')
