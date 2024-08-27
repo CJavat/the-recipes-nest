@@ -1,8 +1,11 @@
+type UserRole = 'ADMIN' | 'USER';
+
 interface SeedUser {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
+  role: UserRole;
 }
 
 interface SeedRecipe {
@@ -26,34 +29,46 @@ interface SeedData {
 export const initialData: SeedData = {
   users: [
     {
+      firstName: 'CJavatX',
+      lastName: 'Administrator',
+      email: 'cjavatx@gmail.com',
+      password: '123456',
+      role: 'ADMIN',
+    },
+    {
       firstName: 'Test',
       lastName: 'User',
       email: 'testuser@gmail.com',
       password: '123456',
+      role: 'USER',
     },
     {
       firstName: 'Daniel',
       lastName: 'Plascencia',
       email: 'daniel@gmail.com',
       password: '123456',
+      role: 'USER',
     },
     {
       firstName: 'Carlos',
       lastName: 'Mercado',
       email: 'carlos@gmail.com',
       password: '123456',
+      role: 'USER',
     },
     {
       firstName: 'Javat',
       lastName: 'Ibarra',
       email: 'javat@gmail.com',
       password: '123456',
+      role: 'USER',
     },
     {
       firstName: 'Isabel',
       lastName: 'Gallegos',
       email: '020902isa@gmail.com',
       password: '123456',
+      role: 'USER',
     },
   ],
   recipes: [

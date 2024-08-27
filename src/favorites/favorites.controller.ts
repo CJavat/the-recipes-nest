@@ -14,6 +14,14 @@ import { AuthGuard } from '@nestjs/passport';
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
 
+  @Get()
+  @UseGuards(AuthGuard())
+  getFavorites(@Req() request: Express.Request) {
+    const userId = request.user['id'];
+
+    return this.favoritesService.getFavorites(userId);
+  }
+
   @Get(':id')
   @UseGuards(AuthGuard())
   createFavorite(@Req() request: Express.Request, @Param('id') id: string) {

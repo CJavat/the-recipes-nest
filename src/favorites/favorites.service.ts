@@ -31,6 +31,11 @@ export class FavoritesService {
         message: 'Favorite created successfully',
       };
     } catch (error) {
+      if (error.code === 'P2002')
+        throw new BadRequestException(
+          'The recipe already exists in the favorites list',
+        );
+
       throw error;
     }
   }
@@ -40,7 +45,12 @@ export class FavoritesService {
       if (!id) throw new BadRequestException('id is required');
 
       const favoriteResponse = await this.prismaClient.favorite.findUnique({
-        where: { id: id },
+        where: {
+          userId_recipeId: {
+            userId: userId,
+            recipeId: id,
+          },
+        },
       });
       if (!favoriteResponse) throw new NotFoundException('Recipe not found');
 
@@ -59,6 +69,21 @@ export class FavoritesService {
         message: 'Favorite removed successfully',
       };
     } catch (error) {
+      throw error;
+    }
+  }
+
+  async getFavorites(userId: string) {
+    try {
+      const favoriteRecipes = await this.prismaClient.favorite.findMany({
+        where: { userId: userId },
+      });
+      if (favoriteRecipes.length === 0)
+        throw new NotFoundException('Favorite recipes not found');
+
+      return favoriteRecipes;
+    } catch (error) {
+      console.log(error);
       throw error;
     }
   }

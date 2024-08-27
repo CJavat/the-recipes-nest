@@ -43,6 +43,7 @@ export class SeedService {
         await this.prismaClient.user.deleteMany({}),
         await this.prismaClient.recipe.deleteMany({}),
         await this.prismaClient.category.deleteMany({}),
+        await this.prismaClient.favorite.deleteMany({}),
       ]);
     } catch (error) {
       throw error;

@@ -27,14 +27,20 @@ model Recipe {
   favorite Favorite[]
 }
 
+enum UserRole {
+  ADMIN
+  USER
+}
+
 model User {
-  id        String  @id @default(uuid())
+  id        String   @id @default(uuid())
   firstName String
   lastName  String
-  email     String  @unique
+  email     String   @unique
   password  String
-  avatar    String? @default("no-user-image.jpg")
-  isActive  Boolean @default(true)
+  avatar    String?  @default("no-user-image.jpg")
+  isActive  Boolean  @default(true)
+  role      UserRole @default(USER)
 
   createdAt DateTime  @default(now())
   updatedAt DateTime?
@@ -58,10 +64,10 @@ model Favorite {
 
   //* Relationship
   userId String
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   recipeId String
-  recipe   Recipe @relation(fields: [recipeId], references: [id])
+  recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
 
   @@unique([userId, recipeId]) // Asegura que un usuario no pueda marcar la misma receta más de una vez
 }
