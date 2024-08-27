@@ -45,6 +45,8 @@ export class AuthService {
     } catch (error) {
       if (error.code === 'P2002')
         throw new BadRequestException('Email already exists');
+
+      throw error;
     }
   }
 
@@ -67,9 +69,7 @@ export class AuthService {
         token: this.checkJwt({ userId: user.id }),
       };
     } catch (error) {
-      return {
-        error: error.response ?? error,
-      };
+      throw error;
     }
   }
 
@@ -77,5 +77,23 @@ export class AuthService {
     const token = this.jwtService.sign(payload);
 
     return token;
+  }
+
+  async checkToken(payload: JwtPayload) {
+    try {
+      const token = this.jwtService.sign(payload);
+
+      const user = await this.prismaClient.user.findUnique({
+        where: { id: payload.userId },
+      });
+      if (!user) throw new NotFoundException('User not found');
+
+      return {
+        ...user,
+        token,
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 }
