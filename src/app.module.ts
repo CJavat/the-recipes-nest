@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 
 import { join } from 'path';
 
@@ -12,12 +14,30 @@ import { CommonModule } from './common/common.module';
 import { SeedModule } from './seed/seed.module';
 import { FilesModule } from './files/files.module';
 import { FavoritesModule } from './favorites/favorites.module';
+import { MailsModule } from './mails/mails.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
+    }),
+    MailerModule.forRoot({
+      transport: {
+        service: process.env.MAILER_SERVICE,
+        auth: {
+          user: process.env.MAILER_EMAIL,
+          pass: process.env.MAILER_PASSWORD,
+        },
+      },
+      defaults: {
+        from: `"No Reply" ${process.env.MAILER_EMAIL}`,
+      },
+      template: {
+        options: {
+          strict: true,
+        },
+      },
     }),
     RecipesModule,
     AuthModule,
@@ -27,6 +47,7 @@ import { FavoritesModule } from './favorites/favorites.module';
     CategoriesModule,
     FilesModule,
     FavoritesModule,
+    MailsModule,
   ],
   controllers: [],
   providers: [],

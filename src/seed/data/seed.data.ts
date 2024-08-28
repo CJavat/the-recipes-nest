@@ -5,7 +5,7 @@ interface SeedUser {
   lastName: string;
   email: string;
   password: string;
-  role: UserRole;
+  role?: UserRole;
 }
 
 interface SeedRecipe {

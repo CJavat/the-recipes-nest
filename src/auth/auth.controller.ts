@@ -1,6 +1,14 @@
-import { Controller, Get, Post, Body, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  UseGuards,
+  Req,
+  Param,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto, LoginUserDto } from './dto';
+import { CreateUserDto, ForgotPasswordDto, LoginUserDto } from './dto';
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
@@ -25,6 +33,15 @@ export class AuthController {
     return this.authService.checkToken({ userId });
   }
 
-  //TODO: forgotPassword
-  //TODO: activateAccount
+  @Post('forgot-password')
+  forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(forgotPasswordDto);
+  }
+
+  @Get('activate-account/:token')
+  activateAccount(@Param('token') token: string) {
+    //TODO: Modificar después para que en lugar de que se vea la respuesta cruda al usuario, le salga un diseño más bonito
+
+    return this.authService.activateAccount(token);
+  }
 }

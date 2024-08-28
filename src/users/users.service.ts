@@ -36,9 +36,7 @@ export class UsersService {
       if (!users || users.length === 0)
         throw new NotFoundException('Users not found');
 
-      return {
-        users,
-      };
+      return users;
     } catch (error) {
       throw error.response ?? error;
     }
@@ -60,9 +58,7 @@ export class UsersService {
         throw new NotFoundException('User not found');
       }
 
-      return {
-        user,
-      };
+      return user;
     } catch (error) {
       throw error.response ?? error;
     }
@@ -70,7 +66,7 @@ export class UsersService {
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     try {
-      const { user } = await this.findOne(id);
+      const user = await this.findOne(id);
       if (user.id !== id)
         throw new UnauthorizedException(
           'You are not allowed to update this account',
@@ -106,7 +102,7 @@ export class UsersService {
 
   async cancelAccount(id: string) {
     try {
-      const { user } = await this.findOne(id);
+      const user = await this.findOne(id);
 
       if (user.id !== id)
         throw new UnauthorizedException(
@@ -161,7 +157,7 @@ export class UsersService {
   async permanentlyDelete(id: string) {
     //TODO: Si la cuenta tiene más de 3 meses inactiva borrarla. Condición: (isActive = false && updatedAt > 3Meses)
     try {
-      const { user } = await this.findOne(id);
+      const user = await this.findOne(id);
       if (user.id !== id)
         throw new UnauthorizedException(
           'You are not allowed to delete this account',
@@ -179,7 +175,7 @@ export class UsersService {
 
   async changeImage(userId: string, file: Express.Multer.File) {
     try {
-      const { user } = await this.findOne(userId);
+      const user = await this.findOne(userId);
       if (user.id !== userId)
         throw new UnauthorizedException(
           'You are not allowed to update this account',

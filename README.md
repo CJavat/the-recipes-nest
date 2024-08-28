@@ -12,3 +12,9 @@
 3. Ejecutar `yarn install` para instalar las dependencias.
 4. Ejecutar `npx prisma migrate deploy` para aplicar las migraciones pendientes.
 5. Iniciar el servidor con `yarn start:dev`.
+
+### Prisma
+
+1. Ejecutar `npx prisma migrate deploy` para obtener los nuevos datos de las migraciones.
+2. Ejecutar `npx prisma migrate dev` cuando se haga un cambio en el `schema.prisma`.
+3. Cuando se haya un cambio en el esquema de prisma, ejecutar `npx prisma generate` para actualizar el cliente de prisma.
