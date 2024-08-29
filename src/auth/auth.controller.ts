@@ -8,7 +8,12 @@ import {
   Param,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto, ForgotPasswordDto, LoginUserDto } from './dto';
+import {
+  CreateUserDto,
+  ForgotPasswordDto,
+  LoginUserDto,
+  UpdatePassword,
+} from './dto';
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
@@ -36,6 +41,14 @@ export class AuthController {
   @Post('forgot-password')
   forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     return this.authService.forgotPassword(forgotPasswordDto);
+  }
+
+  @Post('forgot-password/:token')
+  updateMyPassword(
+    @Param('token') token: string,
+    @Body() updatePassword: UpdatePassword,
+  ) {
+    return this.authService.updateMyPassword(token, updatePassword);
   }
 
   @Get('activate-account/:token')

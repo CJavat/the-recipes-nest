@@ -7,7 +7,12 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaClient } from '@prisma/client';
 import * as bcryptjs from 'bcryptjs';
 
-import { CreateUserDto, ForgotPasswordDto, LoginUserDto } from './dto';
+import {
+  CreateUserDto,
+  ForgotPasswordDto,
+  LoginUserDto,
+  UpdatePassword,
+} from './dto';
 import { JwtPayload } from './interfaces';
 import { MailsService } from 'src/mails/mails.service';
 @Injectable()
@@ -55,7 +60,7 @@ export class AuthService {
       };
     } catch (error) {
       if (error.code === 'P2002')
-        throw new BadRequestException('Email already exists');
+        throw new BadRequestException(['Email already exists']);
 
       throw error;
     }
@@ -69,9 +74,9 @@ export class AuthService {
         where: { email },
       });
       if (!user || (user && !user.isActive))
-        throw new NotFoundException('User not found');
+        throw new NotFoundException(['User not found']);
       if (!bcryptjs.compareSync(password, user.password))
-        throw new BadRequestException('Invalid password');
+        throw new BadRequestException(['Invalid password']);
 
       const { password: encryptedPassword, ...userWithNoPassword } = user;
 
@@ -130,7 +135,7 @@ export class AuthService {
   }
 
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
-    const { email, password } = forgotPasswordDto;
+    const { email } = forgotPasswordDto;
 
     try {
       const user = await this.prismaClient.user.findUnique({
@@ -139,11 +144,40 @@ export class AuthService {
       if (!user)
         throw new NotFoundException(`User with email ${email} not found`);
 
+      const token = this.checkJwt({ userId: user.id });
+      const message = await this.mailsService.sendEmailToUpdatePassword(
+        email,
+        token,
+      );
+
+      return {
+        ok: true,
+        message,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateMyPassword(token: string, updatePassword: UpdatePassword) {
+    const { password } = updatePassword;
+
+    try {
+      const { userId }: JwtPayload = this.jwtService.verify(token);
+
+      const user = await this.prismaClient.user.findUnique({
+        where: { id: userId },
+      });
+      if (!user)
+        throw new NotFoundException(`User with id ${user.id} not found`);
+
       const newPassword = bcryptjs.hashSync(password, 10);
       await this.prismaClient.user.update({
         where: { id: user.id },
         data: { password: newPassword, updatedAt: new Date() },
       });
+
+      await this.mailsService.passwordUpdatedSuccesfully(user.email);
 
       return {
         ok: true,
