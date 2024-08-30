@@ -6,6 +6,7 @@ import {
   UseGuards,
   Req,
   Param,
+  Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
@@ -15,6 +16,7 @@ import {
   UpdatePassword,
 } from './dto';
 import { AuthGuard } from '@nestjs/passport';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -52,9 +54,10 @@ export class AuthController {
   }
 
   @Get('activate-account/:token')
-  activateAccount(@Param('token') token: string) {
-    //TODO: Modificar después para que en lugar de que se vea la respuesta cruda al usuario, le salga un diseño más bonito
+  async activateAccount(@Param('token') token: string, @Res() res: Response) {
+    const { ok, message } = await this.authService.activateAccount(token);
+    if (!ok) return { ok, message };
 
-    return this.authService.activateAccount(token);
+    return res.sendFile('activateAccountTemplate.html', { root: 'public' });
   }
 }

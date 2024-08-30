@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Diseño de Correos</title>
+    <style>
+      body {
+        background-color: #f6f6f6;
+        display: flex;
+        min-height: 100vh;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        box-sizing: border-box;
+      }
+      .container {
+        max-width: 500px;
+        width: 100%;
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+      }
+      .img-logo {
+        width: 200px;
+        height: 200px;
+        margin-bottom: 20px;
+        border-radius: 10px;
+      }
+      .content {
+        text-align: start;
+      }
+      .warning {
+        color: #0ea5e9;
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>The Recipes</h1>
+      <img
+        src="http://localhost:3000/the-recipes-logo.png"
+        alt="Logo The Recipes"
+        class="img-logo"
+      />
+
+      <div class="content">
+        <h3>Cuenta Activada Correctamente</h3>
+
+        <p>Tu cuenta se actualizó correctamente</p>
+        <p>Ya puedes ingresar a tu cuenta</p>
+
+        <p class="warning">
+          Si no tú no creaste esta cuenta, por favor ignora el correo, no es
+          necesario reportarlo.
+        </p>
+
+        <p>¡Muchas Gracias!</p>
+      </div>
+    </div>
+  </body>
+</html>
