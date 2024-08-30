@@ -142,7 +142,7 @@ export class AuthService {
         where: { email },
       });
       if (!user)
-        throw new NotFoundException(`User with email ${email} not found`);
+        throw new NotFoundException([`User with email ${email} not found`]);
 
       const token = this.checkJwt({ userId: user.id });
       const message = await this.mailsService.sendEmailToUpdatePassword(
