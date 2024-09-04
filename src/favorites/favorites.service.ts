@@ -78,8 +78,7 @@ export class FavoritesService {
       const favoriteRecipes = await this.prismaClient.favorite.findMany({
         where: { userId: userId },
       });
-      if (favoriteRecipes.length === 0)
-        throw new NotFoundException('Favorite recipes not found');
+      if (favoriteRecipes.length === 0) return [];
 
       return favoriteRecipes;
     } catch (error) {
