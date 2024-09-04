@@ -77,6 +77,25 @@ export class FavoritesService {
     try {
       const favoriteRecipes = await this.prismaClient.favorite.findMany({
         where: { userId: userId },
+        select: {
+          id: true,
+          createdAt: true,
+          recipeId: true,
+          userId: true,
+          recipe: {
+            select: {
+              id: true,
+              title: true,
+              image: true,
+            },
+          },
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+            },
+          },
+        },
       });
       if (favoriteRecipes.length === 0) return [];
 
