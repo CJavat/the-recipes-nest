@@ -66,8 +66,8 @@ export class UsersService {
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     try {
-      const user = await this.findOne(id);
-      if (user.id !== id)
+      const userExists = await this.findOne(id);
+      if (userExists.id !== id)
         throw new UnauthorizedException(
           'You are not allowed to update this account',
         );
@@ -76,7 +76,7 @@ export class UsersService {
         updateUserDto.password = bcryptjs.hashSync(updateUserDto.password, 10);
       }
 
-      const updatedUser = await this.prismaClient.user.update({
+      const user = await this.prismaClient.user.update({
         where: { id: id },
         data: {
           ...updateUserDto,
@@ -87,14 +87,14 @@ export class UsersService {
           firstName: true,
           lastName: true,
           email: true,
+          avatar: true,
           isActive: true,
+          createdAt: true,
           updatedAt: true,
         },
       });
 
-      return {
-        user: updatedUser,
-      };
+      return user;
     } catch (error) {
       throw error.response ?? error;
     }
