@@ -11,12 +11,12 @@ export class FavoritesService {
 
   async createFavorite(id: string, userId: string) {
     try {
-      if (!id) throw new BadRequestException('id is required');
+      if (!id) throw new BadRequestException(['id is required']);
 
       const recipe = await this.prismaClient.recipe.findUnique({
         where: { id: id },
       });
-      if (!recipe) throw new NotFoundException('Recipe not found');
+      if (!recipe) throw new NotFoundException(['Recipe not found']);
 
       const favorite = await this.prismaClient.favorite.create({
         data: {
@@ -24,7 +24,7 @@ export class FavoritesService {
           userId: userId,
         },
       });
-      if (!favorite) throw new BadRequestException('An error has occurred');
+      if (!favorite) throw new BadRequestException(['An error has occurred']);
 
       return {
         ok: true,
@@ -32,9 +32,9 @@ export class FavoritesService {
       };
     } catch (error) {
       if (error.code === 'P2002')
-        throw new BadRequestException(
+        throw new BadRequestException([
           'The recipe already exists in the favorites list',
-        );
+        ]);
 
       throw error;
     }
@@ -42,7 +42,7 @@ export class FavoritesService {
 
   async deleteFavorite(id: string, userId: string) {
     try {
-      if (!id) throw new BadRequestException('id is required');
+      if (!id) throw new BadRequestException(['id is required']);
 
       const favoriteResponse = await this.prismaClient.favorite.findUnique({
         where: {
@@ -52,7 +52,7 @@ export class FavoritesService {
           },
         },
       });
-      if (!favoriteResponse) throw new NotFoundException('Recipe not found');
+      if (!favoriteResponse) throw new NotFoundException(['Recipe not found']);
 
       const favorite = await this.prismaClient.favorite.delete({
         where: {
@@ -62,7 +62,7 @@ export class FavoritesService {
           },
         },
       });
-      if (!favorite) throw new BadRequestException('An error has occurred');
+      if (!favorite) throw new BadRequestException(['An error has occurred']);
 
       return {
         ok: true,

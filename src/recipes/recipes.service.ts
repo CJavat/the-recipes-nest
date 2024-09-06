@@ -77,7 +77,7 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
       });
 
       if (recipes.length === 0)
-        throw new NotFoundException('Recipes not found');
+        throw new NotFoundException(['Recipes not found']);
 
       return recipes;
     } catch (error) {
@@ -97,7 +97,7 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
       });
 
       if (recipes.length === 0)
-        throw new NotFoundException(`This user has no recipes created`);
+        throw new NotFoundException([`This user has no recipes created`]);
 
       return recipes;
     } catch (error) {
@@ -132,7 +132,7 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
       });
 
       if (recipes.length === 0)
-        throw new NotFoundException('Recipes not found');
+        throw new NotFoundException(['Recipes not found']);
 
       return recipes;
     } catch (error) {
@@ -151,6 +151,7 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
           ingredients: true,
           steps: true,
           image: true,
+          createdAt: true,
           User: {
             select: {
               id: true,
@@ -159,11 +160,17 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
               email: true,
             },
           },
+          Category: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
       });
 
       if (!recipe)
-        throw new NotFoundException(`Recipe with id ${id} not found`);
+        throw new NotFoundException([`Recipe with id ${id} not found`]);
 
       return recipe;
     } catch (error) {
@@ -175,9 +182,9 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
     try {
       const recipe = await this.findOne(id);
       if (recipe.User.id !== userId)
-        throw new UnauthorizedException(
+        throw new UnauthorizedException([
           'You do not have permission to update this recipe',
-        );
+        ]);
 
       const updatedRecipe = await this.recipe.update({
         where: { id: id },
@@ -197,9 +204,9 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
     try {
       const recipe = await this.findOne(id);
       if (recipe.User.id !== userId)
-        throw new UnauthorizedException(
+        throw new UnauthorizedException([
           'You do not have permission to delete this recipe',
-        );
+        ]);
 
       await this.recipe.delete({ where: { id: id } });
 
@@ -215,11 +222,11 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
     try {
       const recipe = await this.findOne(id);
       if (recipe.User.id !== userId)
-        throw new UnauthorizedException(
+        throw new UnauthorizedException([
           'You are not allowed to update this account',
-        );
+        ]);
 
-      if (!file) throw new BadRequestException(`Image ${file} is not valid`);
+      if (!file) throw new BadRequestException([`Image ${file} is not valid`]);
 
       const { secureUrl } = this.filesService.uploadFile(file);
       const image = secureUrl.split('/').at(-1);

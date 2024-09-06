@@ -34,7 +34,7 @@ export class UsersService {
         take: limit,
       });
       if (!users || users.length === 0)
-        throw new NotFoundException('Users not found');
+        throw new NotFoundException(['Users not found']);
 
       return users;
     } catch (error) {
@@ -55,7 +55,7 @@ export class UsersService {
         },
       });
       if (!user || !user.isActive) {
-        throw new NotFoundException('User not found');
+        throw new NotFoundException(['User not found']);
       }
 
       return user;
@@ -68,9 +68,9 @@ export class UsersService {
     try {
       const userExists = await this.findOne(id);
       if (userExists.id !== id)
-        throw new UnauthorizedException(
+        throw new UnauthorizedException([
           'You are not allowed to update this account',
-        );
+        ]);
 
       if (updateUserDto.password) {
         updateUserDto.password = bcryptjs.hashSync(updateUserDto.password, 10);
@@ -105,9 +105,9 @@ export class UsersService {
       const user = await this.findOne(id);
 
       if (user.id !== id)
-        throw new UnauthorizedException(
+        throw new UnauthorizedException([
           'You are not allowed to delete this account',
-        );
+        ]);
 
       // await this.user.delete({ where: { id: id } });
       await this.prismaClient.user.update({
@@ -134,12 +134,12 @@ export class UsersService {
       if (user.isActive) return;
 
       if (user.email !== email)
-        throw new UnauthorizedException(
+        throw new UnauthorizedException([
           'You are not allowed to reactivate this account',
-        );
+        ]);
 
       if (isMoreThan30DaysOld(user.updatedAt))
-        throw new UnauthorizedException('User has been deleted permanently');
+        throw new UnauthorizedException(['User has been deleted permanently']);
 
       await this.prismaClient.user.update({
         where: { email },
@@ -159,9 +159,9 @@ export class UsersService {
     try {
       const user = await this.findOne(id);
       if (user.id !== id)
-        throw new UnauthorizedException(
+        throw new UnauthorizedException([
           'You are not allowed to delete this account',
-        );
+        ]);
 
       await this.prismaClient.user.delete({ where: { id } });
 
@@ -177,11 +177,11 @@ export class UsersService {
     try {
       const user = await this.findOne(userId);
       if (user.id !== userId)
-        throw new UnauthorizedException(
+        throw new UnauthorizedException([
           'You are not allowed to update this account',
-        );
+        ]);
 
-      if (!file) throw new BadRequestException(`Image ${file} is not valid`);
+      if (!file) throw new BadRequestException([`Image ${file} is not valid`]);
 
       const { secureUrl } = this.filesService.uploadFile(file);
       const avatar = secureUrl.split('/').at(-1);
@@ -196,9 +196,10 @@ export class UsersService {
           firstName: true,
           lastName: true,
           email: true,
-          isActive: true,
-          updatedAt: true,
           avatar: true,
+          isActive: true,
+          createdAt: true,
+          updatedAt: true,
         },
       });
 

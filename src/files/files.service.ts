@@ -8,16 +8,16 @@ export class FilesService {
     const path = join(__dirname, '../../public', imageName);
 
     if (!existsSync(path))
-      throw new BadRequestException(
+      throw new BadRequestException([
         `Not product found with image ${imageName}`,
-      );
+      ]);
 
     return path;
   }
 
   uploadFile(file: Express.Multer.File) {
     if (!file)
-      throw new BadRequestException('Make sure that the file is an image');
+      throw new BadRequestException(['Make sure that the file is an image']);
 
     const secureUrl = `${process.env.HOST_API}/files/recipe/${file.filename}`;
 

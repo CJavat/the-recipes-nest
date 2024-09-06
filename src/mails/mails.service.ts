@@ -14,7 +14,9 @@ export class MailsService {
         where: { id: userId },
       });
       if (!user)
-        throw new InternalServerErrorException('An unknown error has occurred');
+        throw new InternalServerErrorException([
+          'An unknown error has occurred',
+        ]);
 
       // Agregar el token a la db
       await this.prismaClient.user.update({
@@ -133,7 +135,9 @@ export class MailsService {
         where: { email },
       });
       if (!user)
-        throw new InternalServerErrorException('An unknown error has occurred');
+        throw new InternalServerErrorException([
+          'An unknown error has occurred',
+        ]);
 
       await this.mailerService.sendMail({
         to: email,
@@ -251,7 +255,9 @@ export class MailsService {
         where: { email },
       });
       if (!user)
-        throw new InternalServerErrorException('An unknown error has occurred');
+        throw new InternalServerErrorException([
+          'An unknown error has occurred',
+        ]);
 
       await this.mailerService.sendMail({
         to: email,

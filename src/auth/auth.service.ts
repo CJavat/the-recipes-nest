@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaClient } from '@prisma/client';
@@ -73,8 +74,12 @@ export class AuthService {
       const user = await this.prismaClient.user.findUnique({
         where: { email },
       });
-      if (!user || (user && !user.isActive))
-        throw new NotFoundException(['User not found']);
+      if (!user) throw new NotFoundException(['User not found']);
+      if (!user.isActive)
+        throw new UnauthorizedException([
+          'user is not active, please activate it',
+        ]);
+
       if (!bcryptjs.compareSync(password, user.password))
         throw new BadRequestException(['Invalid password']);
 
@@ -102,7 +107,7 @@ export class AuthService {
       const user = await this.prismaClient.user.findUnique({
         where: { id: payload.userId },
       });
-      if (!user) throw new NotFoundException('User not found');
+      if (!user) throw new NotFoundException(['User not found']);
 
       return {
         ...user,
@@ -118,7 +123,7 @@ export class AuthService {
       const user = await this.prismaClient.user.findFirst({
         where: { activationToken: token },
       });
-      if (!user) throw new BadRequestException('User not found');
+      if (!user) throw new BadRequestException(['User not found']);
 
       await this.prismaClient.user.update({
         where: { id: user.id },
@@ -169,7 +174,7 @@ export class AuthService {
         where: { id: userId },
       });
       if (!user)
-        throw new NotFoundException(`User with id ${user.id} not found`);
+        throw new NotFoundException([`User with id ${user.id} not found`]);
 
       const newPassword = bcryptjs.hashSync(password, 10);
       await this.prismaClient.user.update({
