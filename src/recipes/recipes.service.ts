@@ -85,6 +85,26 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
     }
   }
 
+  async findAllOwnRecipess(userId: string, paginationDto: PaginationDto) {
+    const { limit = 10, offset = 0 } = paginationDto;
+
+    try {
+      const recipes = await this.recipe.findMany({
+        where: { userId },
+        include: { User: true },
+        skip: offset,
+        take: limit,
+      });
+
+      if (recipes.length === 0)
+        throw new NotFoundException([`This user has no recipes created`]);
+
+      return recipes;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async findAllByUser(userId: string, paginationDto: PaginationDto) {
     const { limit = 10, offset = 0 } = paginationDto;
 

@@ -53,15 +53,23 @@ export class RecipesController {
     return this.recipesService.findAll(paginationDto);
   }
 
-  @Get('by-user')
+  @Get('own-recipes')
   @UseGuards(AuthGuard())
-  findAllByUser(
+  findAllOwnRecipess(
     @Req() request: Express.Request,
     @Query() paginationDto: PaginationDto,
   ) {
     const userId = request.user['id'];
 
-    return this.recipesService.findAllByUser(userId, paginationDto);
+    return this.recipesService.findAllOwnRecipess(userId, paginationDto);
+  }
+
+  @Get('by-user/:id')
+  findAllByUser(
+    @Param('id') id: string,
+    @Query() paginationDto: PaginationDto,
+  ) {
+    return this.recipesService.findAllByUser(id, paginationDto);
   }
 
   @Get('by-category/:idCategory')
