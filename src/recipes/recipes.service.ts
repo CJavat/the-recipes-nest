@@ -42,6 +42,29 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
           ...createRecipeDto,
           userId,
         },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          ingredients: true,
+          steps: true,
+          image: true,
+          createdAt: true,
+          User: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+          Category: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
       });
 
       return recipe;
@@ -198,8 +221,18 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
     }
   }
 
-  async update(userId: string, id: string, updateRecipeDto: UpdateRecipeDto) {
+  async update(
+    userId: string,
+    id: string,
+    updateRecipeDto: UpdateRecipeDto,
+    file?: Express.Multer.File,
+  ) {
     try {
+      if (file) {
+        const { secureUrl } = this.filesService.uploadFile(file);
+        updateRecipeDto.image = secureUrl.split('/').at(-1);
+      }
+
       const recipe = await this.findOne(id);
       if (recipe.User.id !== userId)
         throw new UnauthorizedException([
@@ -211,6 +244,29 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
         data: {
           ...updateRecipeDto,
           updatedAt: new Date(),
+        },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          ingredients: true,
+          steps: true,
+          image: true,
+          createdAt: true,
+          User: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+          Category: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
       });
 
@@ -285,23 +341,36 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
     try {
       const recipes = await this.recipe.findMany({
         where: {
-          AND: [
-            {
-              title: {
-                contains: title,
-                mode: 'insensitive', // Búsqueda insensible a mayúsculas y minúsculas
-              },
-            },
-            {
-              description: {
-                contains: description,
-                mode: 'insensitive',
-              },
-            },
-          ],
+          title: {
+            contains: title,
+            mode: 'insensitive',
+          },
         },
         skip: offset,
         take: limit,
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          ingredients: true,
+          steps: true,
+          image: true,
+          createdAt: true,
+          User: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+          Category: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
       });
 
       return recipes;

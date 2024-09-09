@@ -19,4 +19,7 @@ export class CreateRecipeDto {
   @IsString()
   @IsOptional()
   image?: string;
+
+  @IsString()
+  categoryId: string;
 }

@@ -67,9 +67,12 @@ export class SeedService {
       const userRandom = Math.floor(Math.random() * 5);
       const categoryRandom = Math.floor(Math.random() * categories.length);
 
-      recipe['categoryId'] = categories[categoryRandom];
+      const newRecipe = {
+        ...recipe,
+        categoryId: categories[categoryRandom],
+      };
 
-      await this.recipesService.create(users[userRandom], recipe);
+      await this.recipesService.create(users[userRandom], newRecipe);
     });
   }
 

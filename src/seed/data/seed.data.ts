@@ -14,6 +14,7 @@ interface SeedRecipe {
   ingredients: string[];
   steps: string[];
   image?: string;
+  categoryId?: string;
 }
 
 interface SeedCategory {

@@ -113,14 +113,24 @@ export class RecipesController {
 
   @Patch(':id')
   @UseGuards(AuthGuard())
+  @UseInterceptors(
+    FileInterceptor('file', {
+      fileFilter: fileFilter,
+      storage: diskStorage({
+        destination: './public',
+        filename: fileNamer,
+      }),
+    }),
+  )
   update(
     @Req() request: Express.Request,
     @Param('id') id: string,
     @Body() updateRecipeDto: UpdateRecipeDto,
+    @UploadedFile() file: Express.Multer.File,
   ) {
     const userId = request.user['id'];
 
-    return this.recipesService.update(userId, id, updateRecipeDto);
+    return this.recipesService.update(userId, id, updateRecipeDto, file);
   }
 
   @Delete(':id')
