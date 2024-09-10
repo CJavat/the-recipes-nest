@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  recipes-db:
+    container_name: recipes_database
+    image: postgres:16.2
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: recipes_db
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    restart: always
+
+  recipes-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: recipes_backend
+    ports:
+      - 3000:3000
+    depends_on:
+      - recipes-db
+    environment:
+      PORT: ${PORT}
+      HOST_API: ${HOST_API}
+      FRONTEND_URL: ${FRONTEND_URL}
+      SECRET_KEY: ${SECRET_KEY}
+      DATABASE_URL: ${DATABASE_URL}
+      MAILER_SERVICE: ${MAILER_SERVICE}
+      MAILER_EMAIL: ${MAILER_EMAIL}
+      MAILER_PASSWORD: ${MAILER_PASSWORD}
+      MAILER_NAME_EMAIL: ${MAILER_NAME_EMAIL}
+      NODE_ENV: development
+    restart: always
