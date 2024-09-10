@@ -1,6 +1,0 @@
-services:  
-  - type: web
-    name: the-recipes-nest
-    env: node
-    buildCommand: yarn build
-    startCommand: yarn start
