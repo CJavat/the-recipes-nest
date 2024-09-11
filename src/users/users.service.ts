@@ -20,10 +20,9 @@ export class UsersService {
 
   async findAll(paginationDto: PaginationDto) {
     const { limit = 10, offset = 0 } = paginationDto;
-    const currentPage = Math.floor(offset / limit) + 1;
 
     try {
-      const finalPage = await this.prismaClient.user.count();
+      const totalUsers = await this.prismaClient.user.count();
       const users = await this.prismaClient.user.findMany({
         select: {
           id: true,
@@ -40,8 +39,9 @@ export class UsersService {
 
       return {
         users,
-        currentPage,
-        finalPage,
+        totalUsers,
+        currentPage: Math.floor(offset / limit) + 1,
+        totalPages: Math.ceil(totalUsers / limit),
       };
     } catch (error) {
       throw error.response ?? error;
