@@ -1,6 +1,7 @@
 # environments variables & DB
 .env
 postgres/
+yarn.lock
 
 # compiled output
 /dist
