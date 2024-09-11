@@ -14,6 +14,7 @@ import { SeedModule } from './seed/seed.module';
 import { FilesModule } from './files/files.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { MailsModule } from './mails/mails.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { MailsModule } from './mails/mails.module';
     FilesModule,
     FavoritesModule,
     MailsModule,
+    CloudinaryModule,
   ],
   controllers: [],
   providers: [],

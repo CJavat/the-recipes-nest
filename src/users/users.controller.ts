@@ -18,14 +18,17 @@ import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { fileNamer } from 'src/files/helpers/fileNamer.helper';
 import { fileFilter } from 'src/files/helpers/fileFilter.helper';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { UploadApiResponse } from 'cloudinary';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   @Get()
   findAll(@Query() paginationDto: PaginationDto) {
@@ -55,22 +58,19 @@ export class UsersController {
 
   @Patch('change-image')
   @UseGuards(AuthGuard())
-  @UseInterceptors(
-    FileInterceptor('file', {
-      fileFilter: fileFilter,
-      storage: diskStorage({
-        destination: './public',
-        filename: fileNamer,
-      }),
-    }),
-  )
-  changeImage(
+  @UseInterceptors(FileInterceptor('file', { fileFilter: fileFilter }))
+  async changeImage(
     @Req() request: Express.Request,
     @UploadedFile() file: Express.Multer.File,
   ) {
     const userId = request.user['id'];
 
-    return this.usersService.changeImage(userId, file);
+    const fileName = await this.cloudinaryService.uploadImage(file, 'users');
+
+    if ('error' in fileName)
+      throw new Error('Ha ocurrido un error al subir la foto');
+
+    return this.usersService.changeImage(userId, fileName as UploadApiResponse);
   }
 
   @Get(':id')
