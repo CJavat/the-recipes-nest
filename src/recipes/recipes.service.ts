@@ -75,8 +75,10 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
 
   async findAll(paginationDto: PaginationDto) {
     const { limit = 10, offset = 0 } = paginationDto;
+    const currentPage = Math.floor(offset / limit) + 1;
 
     try {
+      const totalPages = await this.recipe.count();
       const recipes = await this.recipe.findMany({
         // include: { User: true },
         select: {
@@ -102,7 +104,11 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
       if (recipes.length === 0)
         throw new NotFoundException(['Recipes not found']);
 
-      return recipes;
+      return {
+        recipes,
+        currentPage,
+        totalPages,
+      };
     } catch (error) {
       throw error;
     }
@@ -336,7 +342,7 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
   }
 
   async searchRecipe(searchRecipeDto: SearchRecipeDto) {
-    const { title, description, limit, offset } = searchRecipeDto;
+    const { title, description } = searchRecipeDto;
 
     try {
       const recipes = await this.recipe.findMany({
@@ -346,8 +352,6 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
             mode: 'insensitive',
           },
         },
-        skip: offset,
-        take: limit,
         select: {
           id: true,
           title: true,

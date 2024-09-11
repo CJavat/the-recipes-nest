@@ -20,8 +20,10 @@ export class UsersService {
 
   async findAll(paginationDto: PaginationDto) {
     const { limit = 10, offset = 0 } = paginationDto;
+    const currentPage = Math.floor(offset / limit) + 1;
 
     try {
+      const finalPage = await this.prismaClient.user.count();
       const users = await this.prismaClient.user.findMany({
         select: {
           id: true,
@@ -36,7 +38,11 @@ export class UsersService {
       if (!users || users.length === 0)
         throw new NotFoundException(['Users not found']);
 
-      return users;
+      return {
+        users,
+        currentPage,
+        finalPage,
+      };
     } catch (error) {
       throw error.response ?? error;
     }
