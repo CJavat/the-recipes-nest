@@ -86,12 +86,19 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
           ingredients: true,
           steps: true,
           image: true,
+          createdAt: true,
           User: {
             select: {
               id: true,
               firstName: true,
               lastName: true,
               email: true,
+            },
+          },
+          Category: {
+            select: {
+              id: true,
+              name: true,
             },
           },
         },
@@ -120,7 +127,29 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
       const totalRecipes = await this.recipe.count({ where: { userId } });
       const recipes = await this.recipe.findMany({
         where: { userId },
-        include: { User: true },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          ingredients: true,
+          steps: true,
+          image: true,
+          createdAt: true,
+          User: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+          Category: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
         skip: offset,
         take: limit,
       });
@@ -146,7 +175,29 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
       const totalRecipes = await this.recipe.count({ where: { userId } });
       const recipes = await this.recipe.findMany({
         where: { userId },
-        include: { User: true },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          ingredients: true,
+          steps: true,
+          image: true,
+          createdAt: true,
+          User: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+          Category: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
         skip: offset,
         take: limit,
       });
@@ -181,12 +232,19 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
           ingredients: true,
           steps: true,
           image: true,
+          createdAt: true,
           User: {
             select: {
               id: true,
               firstName: true,
               lastName: true,
               email: true,
+            },
+          },
+          Category: {
+            select: {
+              id: true,
+              name: true,
             },
           },
         },
