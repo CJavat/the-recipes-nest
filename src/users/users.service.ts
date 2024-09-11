@@ -11,6 +11,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { isMoreThan30DaysOld } from './helpers/isMoreThan60DaysOld.helper';
 import { FilesService } from '../files/files.service';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { UploadApiResponse } from 'cloudinary';
 
 @Injectable()
 export class UsersService {
@@ -179,7 +180,8 @@ export class UsersService {
     }
   }
 
-  async changeImage(userId: string, file: Express.Multer.File) {
+  async changeImage(userId: string, file: UploadApiResponse) {
+    const { url } = file;
     try {
       const user = await this.findOne(userId);
       if (user.id !== userId)
@@ -189,13 +191,10 @@ export class UsersService {
 
       if (!file) throw new BadRequestException([`Image ${file} is not valid`]);
 
-      const { secureUrl } = this.filesService.uploadFile(file);
-      const avatar = secureUrl.split('/').at(-1);
-
       const updatedUser = await this.prismaClient.user.update({
         where: { id: userId },
         data: {
-          avatar: avatar,
+          avatar: url,
         },
         select: {
           id: true,

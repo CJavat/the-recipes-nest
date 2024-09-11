@@ -12,6 +12,7 @@ import { PrismaClient } from '@prisma/client';
 import { FilesService } from 'src/files/files.service';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { SearchRecipeDto } from './dto/search-recipe.dto';
+import { UploadApiResponse } from 'cloudinary';
 
 @Injectable()
 export class RecipesService extends PrismaClient implements OnModuleInit {
@@ -29,12 +30,11 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
   async create(
     userId: string,
     createRecipeDto: CreateRecipeDto,
-    file?: Express.Multer.File,
+    file?: UploadApiResponse,
   ) {
     try {
       if (file) {
-        const { secureUrl } = this.filesService.uploadFile(file);
-        createRecipeDto.image = secureUrl.split('/').at(-1);
+        createRecipeDto.image = file.url;
       }
 
       const recipe = await this.recipe.create({
@@ -308,12 +308,11 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
     userId: string,
     id: string,
     updateRecipeDto: UpdateRecipeDto,
-    file?: Express.Multer.File,
+    file?: UploadApiResponse,
   ) {
     try {
       if (file) {
-        const { secureUrl } = this.filesService.uploadFile(file);
-        updateRecipeDto.image = secureUrl.split('/').at(-1);
+        updateRecipeDto.image = file.url;
       }
 
       const recipe = await this.findOne(id);
@@ -377,7 +376,8 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
     }
   }
 
-  async changeImage(id: string, userId: string, file: Express.Multer.File) {
+  async changeImage(id: string, userId: string, file: UploadApiResponse) {
+    const { url } = file;
     try {
       const recipe = await this.findOne(id);
       if (recipe.User.id !== userId)
@@ -387,13 +387,10 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
 
       if (!file) throw new BadRequestException([`Image ${file} is not valid`]);
 
-      const { secureUrl } = this.filesService.uploadFile(file);
-      const image = secureUrl.split('/').at(-1);
-
       const updatedUser = await this.recipe.update({
         where: { id: id },
         data: {
-          image: image,
+          image: url,
           updatedAt: new Date(),
         },
         select: {
@@ -419,7 +416,7 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
   }
 
   async searchRecipe(searchRecipeDto: SearchRecipeDto) {
-    const { title, description, limit, offset } = searchRecipeDto;
+    const { title, description } = searchRecipeDto;
 
     try {
       const recipes = await this.recipe.findMany({
