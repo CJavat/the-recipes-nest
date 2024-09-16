@@ -138,7 +138,10 @@ export class UsersService {
         where: { email },
       });
 
-      if (user.isActive) return;
+      if (user.isActive)
+        return {
+          message: `User with email ${email} is already active`,
+        };
 
       if (user.email !== email)
         throw new UnauthorizedException([
