@@ -34,7 +34,7 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
   ) {
     try {
       if (file) {
-        createRecipeDto.image = file.url;
+        createRecipeDto.image = file.url.replace('http', 'https');
       }
 
       const recipe = await this.recipe.create({
@@ -312,7 +312,7 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
   ) {
     try {
       if (file) {
-        updateRecipeDto.image = file.url;
+        updateRecipeDto.image = file.url.replace('http', 'https');
       }
 
       const recipe = await this.findOne(id);
@@ -390,7 +390,7 @@ export class RecipesService extends PrismaClient implements OnModuleInit {
       const updatedUser = await this.recipe.update({
         where: { id: id },
         data: {
-          image: url,
+          image: url.replace('http', 'https'),
           updatedAt: new Date(),
         },
         select: {
