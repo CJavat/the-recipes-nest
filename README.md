@@ -1,7 +1,7 @@
 # The Recipes Nest - BACKEND
 
 <p align="center">
-  <a href="#" target="blank"><img src="./public/android-chrome-512x512.png" width="200" style="margin: 0 30px" alt="The Recipes Logo" /></a>
+  <a href="#" target="blank"><img src="./public/the-recipes-logo.png" width="200" style="margin: 0 30px" alt="The Recipes Logo" /></a>
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" style="margin: 0 30px" /></a>
 </p>
 
