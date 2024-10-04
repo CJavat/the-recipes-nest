@@ -185,6 +185,7 @@ export class UsersService {
 
   async changeImage(userId: string, file: UploadApiResponse) {
     const { url } = file;
+
     try {
       const user = await this.findOne(userId);
       if (user.id !== userId)
@@ -197,7 +198,7 @@ export class UsersService {
       const updatedUser = await this.prismaClient.user.update({
         where: { id: userId },
         data: {
-          avatar: url,
+          avatar: url.replace('http', 'https'),
         },
         select: {
           id: true,
